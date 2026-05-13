@@ -129,6 +129,16 @@
               {% endfor %}
               {% endif %}
 
+              {% if source_flavours %}
+              <hr>
+              <h3 class="p-heading--5">Flavours</h3>
+              <ul class="p-list">
+                {% for flavour in source_flavours %}
+                <li class="p-list__item"><a href="{{ flavour.url }}">{{ flavour.name }}</a></li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+
               <hr>
               <details class="u-yaml-expand">
                 <summary>Raw YAML</summary>
@@ -139,97 +149,5 @@
         </div>
       </div>
     </section>
-  </body>
-</html>
-        </div>
-      </section>
-
-      <section class="content-grid">
-        <div class="panel">
-          <div class="panel-heading">
-            <h2>Source metadata</h2>
-            <p>{{ source_field_names|length }} fields</p>
-          </div>
-          <dl>
-            <div>
-              <dt>Series</dt>
-              <dd>{{ series_name }}</dd>
-            </div>
-            <div>
-              <dt>Codename</dt>
-              <dd>{{ codename }}</dd>
-            </div>
-            <div>
-              <dt>Supported</dt>
-              <dd><span class="badge {{ 'state-true' if supported else 'state-false' }}">{{ 'true' if supported else 'false' }}</span></dd>
-            </div>
-            <div>
-              <dt>Development</dt>
-              <dd><span class="badge {{ 'state-true' if development else 'state-false' }}">{{ 'true' if development else 'false' }}</span></dd>
-            </div>
-            {% if source_owner %}
-            <div>
-              <dt>Owner</dt>
-              <dd>{{ source_owner }}</dd>
-            </div>
-            {% endif %}
-            {% if source_swm and source_swm.items() %}
-            <div>
-              <dt>SWM</dt>
-              <dd>
-                {% for key, val in source_swm.items() %}
-                  {% if val is sameas true or val is sameas false %}
-                  <span class="source-link">{{ key }}: <span class="badge {{ 'state-true' if val else 'state-false' }}">{{ 'true' if val else 'false' }}</span></span>
-                  {% else %}
-                  <span class="source-link">{{ key }}: {{ val }}</span>
-                  {% endif %}
-                {% endfor %}
-              </dd>
-            </div>
-            {% endif %}
-            {% if source_packages %}
-            <div>
-              <dt>Packages</dt>
-              <dd class="source-links">
-                {% for pkg in source_packages %}
-                <a class="source-link" href="{{ pkg.url }}">{{ pkg.name }}</a>
-                {% endfor %}
-              </dd>
-            </div>
-            {% endif %}
-            {% if source_snaps %}
-            <div>
-              <dt>Snaps</dt>
-              <dd>
-                {% for snap in source_snaps %}
-                <details class="yaml-expand">
-                  <summary>{% if snap.repo %}<a href="{{ snap.repo }}" target="_blank" rel="noreferrer">{{ snap.name }}</a><button class="copy-btn" type="button" aria-label="Copy link" onclick="navigator.clipboard.writeText('{{ snap.repo }}')">&#128203;</button>{% else %}{{ snap.name }}{% endif %}</summary>
-                  <pre class="series-yaml">{{ snap.yaml }}</pre>
-                </details>
-                {% endfor %}
-              </dd>
-            </div>
-            {% endif %}
-            {% if source_testing %}
-            <div>
-              <dt>Testing</dt>
-              <dd>
-                {% for entry in source_testing %}
-                <details class="yaml-expand">
-                  <summary>{{ entry.key }}</summary>
-                  <pre class="series-yaml">{{ entry.yaml }}</pre>
-                </details>
-                {% endfor %}
-              </dd>
-            </div>
-            {% endif %}
-          </dl>
-          <details class="yaml-expand">
-            <summary>Raw YAML</summary>
-            <pre class="series-yaml">{{ source_yaml }}</pre>
-          </details>
-        </div>
-      </section>
-    </main>
   </body>
 </html>
