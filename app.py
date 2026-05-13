@@ -105,6 +105,7 @@ def create_app() -> Flask:
                 "name": snap_name,
                 "repo": (snap_data.get("repo") or [None])[0] if isinstance(snap_data, dict) else None,
                 "yaml": yaml.safe_dump(snap_data, sort_keys=False, allow_unicode=False) if isinstance(snap_data, dict) else str(snap_data),
+                "url": url_for("snap_detail", series_name=series_name, source_name=source_name, snap_name=snap_name),
             }
             for snap_name, snap_data in sorted(raw_snaps.items())
         ]
@@ -132,6 +133,48 @@ def create_app() -> Flask:
             source_testing=source_testing,
             source_yaml=source_yaml,
             source_field_names=source_field_names,
+        )
+
+    @app.route("/series/<series_name>/source/<source_name>/snap/<snap_name>")
+    def snap_detail(series_name: str, source_name: str, snap_name: str) -> str:
+        try:
+            snapshot = load_latest_snapshot()
+        except DashboardError as exc:
+            return render_template("index.html", snapshot=None, series_cards=[], error_message=str(exc)), 502
+
+        series_details = snapshot.filtered_series_map.get(series_name)
+        if not isinstance(series_details, dict):
+            abort(404)
+
+        sources = series_details.get("sources")
+        if not isinstance(sources, dict):
+            abort(404)
+
+        source_details = sources.get(source_name)
+        if not isinstance(source_details, dict):
+            abort(404)
+
+        raw_snaps = source_details.get("snaps", {})
+        if not isinstance(raw_snaps, dict):
+            abort(404)
+
+        snap_data = raw_snaps.get(snap_name)
+        if snap_data is None:
+            abort(404)
+
+        snap_repo = (snap_data.get("repo") or [None])[0] if isinstance(snap_data, dict) else None
+        snap_yaml = yaml.safe_dump({snap_name: snap_data}, sort_keys=False, allow_unicode=False)
+
+        return render_template(
+            "snap.html",
+            snapshot=snapshot,
+            series_name=series_name,
+            codename=series_details.get("codename", "unknown"),
+            source_name=source_name,
+            snap_name=snap_name,
+            snap_repo=snap_repo,
+            snap_yaml=snap_yaml,
+            snap_data=snap_data if isinstance(snap_data, dict) else {},
         )
 
     @app.route("/series/<series_name>/source/<source_name>/package/<package_name>")

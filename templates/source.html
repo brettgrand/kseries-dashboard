@@ -111,12 +111,11 @@
               {% if source_snaps %}
               <hr>
               <h3 class="p-heading--5">Snaps</h3>
-              {% for snap in source_snaps %}
-              <details class="u-yaml-expand">
-                <summary>{% if snap.repo %}<a href="{{ snap.repo }}" target="_blank" rel="noreferrer">{{ snap.name }}</a><button class="copy-btn" type="button" aria-label="Copy link" onclick="navigator.clipboard.writeText('{{ snap.repo }}')">&#128203;</button>{% else %}{{ snap.name }}{% endif %}</summary>
-                <pre class="series-yaml"><code>{{ snap.yaml }}</code></pre>
-              </details>
-              {% endfor %}
+              <ul class="p-list">
+                {% for snap in source_snaps %}
+                <li class="p-list__item"><a href="{{ snap.url }}">{{ snap.name }}</a></li>
+                {% endfor %}
+              </ul>
               {% endif %}
 
               {% if source_testing %}
@@ -142,7 +141,6 @@
     </section>
   </body>
 </html>
-          <a href="{{ snapshot.source_url }}" target="_blank" rel="noreferrer">Open source YAML</a>
         </div>
       </section>
 
