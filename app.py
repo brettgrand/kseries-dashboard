@@ -344,7 +344,7 @@ def series_sort_key(series_name: str) -> tuple[int, int]:
 def build_series_cards(series_map: dict[str, Any]) -> list[dict[str, Any]]:
     cards: list[dict[str, Any]] = []
 
-    for series_name, details in sorted(series_map.items(), key=lambda item: series_sort_key(item[0]), reverse=True):
+    for series_name, details in sorted(series_map.items(), key=lambda item: (not (isinstance(item[1], dict) and item[1].get("supported")), tuple(-x for x in series_sort_key(item[0])))):
         field_names = sorted(details.keys()) if isinstance(details, dict) else []
         opening = details.get("opening") if isinstance(details, dict) else None
         opening_steps = sorted(opening.keys()) if isinstance(opening, dict) else []
