@@ -75,6 +75,30 @@
                   <dd>{{ source_owner }}</dd>
                 </div>
                 {% endif %}
+                {% if source_versions %}
+                <div class="col-3">
+                  <dt>Versions</dt>
+                  <dd>{{ source_versions | join(', ') }}</dd>
+                </div>
+                {% endif %}
+                {% if source_variants %}
+                <div class="col-9">
+                  <dt>Variants</dt>
+                  <dd>{{ source_variants | join(', ') }}</dd>
+                </div>
+                {% endif %}
+                {% if source_package_relations %}
+                <div class="col-4">
+                  <dt>Package relations</dt>
+                  <dd>{{ source_package_relations }}</dd>
+                </div>
+                {% endif %}
+                {% if source_derived_from %}
+                <div class="col-4">
+                  <dt>Derived from</dt>
+                  <dd><a href="{{ url_for('source_detail', series_name=source_derived_from[0], source_name=source_derived_from[1]) }}">{{ source_derived_from[0] }}/{{ source_derived_from[1] }}</a></dd>
+                </div>
+                {% endif %}
               </dl>
 
               {% if source_swm and source_swm.items() %}
