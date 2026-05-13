@@ -80,6 +80,33 @@
               </dd>
             </div>
             {% endif %}
+            {% if source_snaps %}
+            <div>
+              <dt>Snaps</dt>
+              <dd class="source-links">
+                {% for snap in source_snaps %}
+                  {% if snap.repo %}
+                  <a class="source-link" href="{{ snap.repo }}" target="_blank" rel="noreferrer">{{ snap.name }}</a>
+                  {% else %}
+                  <span class="source-link">{{ snap.name }}</span>
+                  {% endif %}
+                {% endfor %}
+              </dd>
+            </div>
+            {% endif %}
+            {% if source_testing %}
+            <div>
+              <dt>Testing</dt>
+              <dd>
+                {% for entry in source_testing %}
+                <details class="yaml-expand">
+                  <summary>{{ entry.key }}</summary>
+                  <pre class="series-yaml">{{ entry.yaml }}</pre>
+                </details>
+                {% endfor %}
+              </dd>
+            </div>
+            {% endif %}
           </dl>
           <details class="yaml-expand">
             <summary>Raw YAML</summary>

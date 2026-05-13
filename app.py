@@ -95,6 +95,23 @@ def create_app() -> Flask:
             }
             for pkg_name, pkg_data in sorted(raw_packages.items())
         ]
+        raw_snaps = source_details.get("snaps", {}) if isinstance(source_details, dict) else {}
+        if not isinstance(raw_snaps, dict):
+            raw_snaps = {}
+        source_snaps = [
+            {
+                "name": snap_name,
+                "repo": (snap_data.get("repo") or [None])[0] if isinstance(snap_data, dict) else None,
+            }
+            for snap_name, snap_data in sorted(raw_snaps.items())
+        ]
+        raw_testing = source_details.get("testing", {}) if isinstance(source_details, dict) else {}
+        if not isinstance(raw_testing, dict):
+            raw_testing = {}
+        source_testing = [
+            {"key": k, "yaml": yaml.safe_dump(v, sort_keys=False, allow_unicode=False)}
+            for k, v in sorted(raw_testing.items())
+        ]
         source_yaml = yaml.safe_dump({source_name: source_details}, sort_keys=False, allow_unicode=False)
 
         return render_template(
@@ -108,6 +125,8 @@ def create_app() -> Flask:
             source_owner=source_details.get("owner") if isinstance(source_details, dict) else None,
             source_swm=source_details.get("swm") if isinstance(source_details, dict) else None,
             source_packages=source_packages,
+            source_snaps=source_snaps,
+            source_testing=source_testing,
             source_yaml=source_yaml,
             source_field_names=source_field_names,
         )
