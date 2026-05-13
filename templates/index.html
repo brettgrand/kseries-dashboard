@@ -64,7 +64,7 @@
       <section class="content-grid">
         <div class="panel">
           <div class="panel-heading">
-            <h2>Series overview</h2>
+            <h2>Data by series</h2>
             <p>{{ series_cards|length }} rows</p>
           </div>
           <div class="series-grid">
@@ -72,17 +72,20 @@
             <article class="series-card">
               <div class="series-header">
                 <div>
-                  <h3>{{ card.series_name }}</h3>
-                  <p>{{ card.codename }}</p>
+                  <h3>{{ card.series_name }} <span class="series-codename">({{ card.codename }})</span></h3>
                 </div>
                 <div class="badges">
-                  {% if card.supported %}<span class="badge supported">supported</span>{% endif %}
-                  {% if card.development %}<span class="badge development">development</span>{% endif %}
-                  {% if card.lts %}<span class="badge lts">lts</span>{% endif %}
+                  <span class="badge {{ 'state-true' if card.supported else 'state-false' }}">supported: {{ 'true' if card.supported else 'false' }}</span>
+                  <span class="badge {{ 'state-true' if card.development else 'state-false' }}">development: {{ 'true' if card.development else 'false' }}</span>
+                  <span class="badge {{ 'state-true' if card.lts else 'state-false' }}">lts: {{ 'true' if card.lts else 'false' }}</span>
                   {% if card.esm %}<span class="badge esm">esm</span>{% endif %}
                 </div>
               </div>
               <dl>
+                <div>
+                  <dt>Fields</dt>
+                  <dd>{{ card.field_count }}</dd>
+                </div>
                 <div>
                   <dt>Sources</dt>
                   <dd>{{ card.source_count }}</dd>
@@ -92,21 +95,26 @@
                   <dd>{{ card.opening_steps|join(', ') if card.opening_steps else 'none' }}</dd>
                 </div>
                 <div>
-                  <dt>Sample sources</dt>
-                  <dd>{{ card.source_names|join(', ') if card.source_names else 'none' }}</dd>
+                  <dt>Top-level keys</dt>
+                  <dd>{{ card.field_names|join(', ') if card.field_names else 'scalar entry' }}</dd>
+                </div>
+                <div>
+                  <dt>Source pages</dt>
+                  <dd class="source-links">
+                    {% if card.source_links %}
+                      {% for source in card.source_links %}
+                      <a class="source-link" href="{{ source.url }}">{{ source.name }}</a>
+                      {% endfor %}
+                    {% else %}
+                      none
+                    {% endif %}
+                  </dd>
                 </div>
               </dl>
+              <pre class="series-yaml">{{ card.yaml_block }}</pre>
             </article>
             {% endfor %}
           </div>
-        </div>
-
-        <div class="panel raw-panel">
-          <div class="panel-heading">
-            <h2>Raw YAML</h2>
-            <p>Direct payload for inspection</p>
-          </div>
-          <pre>{{ snapshot.raw_yaml }}</pre>
         </div>
       </section>
       {% endif %}

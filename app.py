@@ -9,12 +9,13 @@ from typing import Any
 
 import requests
 import yaml
-from flask import Flask, render_template
+from flask import Flask, abort, render_template, url_for
 
 
 BASE_URL = "https://kernel.ubuntu.com/info/"
 LIVE_YAML_NAME = "kernel-series.yaml"
 ARCHIVE_PATTERN = re.compile(r"kernel-series\.yaml@(\d{4}\.\d{2}\.\d{2})")
+SERIES_ROOT_PATTERN = re.compile(r"^\d+\.\d+$")
 REQUEST_TIMEOUT = 20
 
 
@@ -33,15 +34,23 @@ class KernelSeriesSnapshot:
 
     @property
     def total_series(self) -> int:
-        return len(self.series_map)
+        return len(self.filtered_series_map)
 
     @property
     def supported_series(self) -> int:
-        return sum(1 for details in self.series_map.values() if details.get("supported"))
+        return sum(1 for details in self.filtered_series_map.values() if details.get("supported"))
 
     @property
     def development_series(self) -> int:
-        return sum(1 for details in self.series_map.values() if details.get("development"))
+        return sum(1 for details in self.filtered_series_map.values() if details.get("development"))
+
+    @property
+    def filtered_series_map(self) -> dict[str, Any]:
+        return {
+            series_name: details
+            for series_name, details in self.series_map.items()
+            if is_series_root_number(series_name)
+        }
 
 
 def create_app() -> Flask:
@@ -51,10 +60,42 @@ def create_app() -> Flask:
     def index() -> str:
         try:
             snapshot = load_latest_snapshot()
-            series_cards = build_series_cards(snapshot.series_map)
+            series_cards = build_series_cards(snapshot.filtered_series_map)
             return render_template("index.html", snapshot=snapshot, series_cards=series_cards, error_message=None)
         except DashboardError as exc:
             return render_template("index.html", snapshot=None, series_cards=[], error_message=str(exc)), 502
+
+    @app.route("/series/<series_name>/source/<path:source_name>")
+    def source_detail(series_name: str, source_name: str) -> str:
+        try:
+            snapshot = load_latest_snapshot()
+        except DashboardError as exc:
+            return render_template("index.html", snapshot=None, series_cards=[], error_message=str(exc)), 502
+
+        series_details = snapshot.filtered_series_map.get(series_name)
+        if not isinstance(series_details, dict):
+            abort(404)
+
+        sources = series_details.get("sources")
+        if not isinstance(sources, dict):
+            abort(404)
+
+        source_details = sources.get(source_name)
+        if source_details is None:
+            abort(404)
+
+        source_field_names = sorted(source_details.keys()) if isinstance(source_details, dict) else []
+        source_yaml = yaml.safe_dump({source_name: source_details}, sort_keys=False, allow_unicode=False)
+
+        return render_template(
+            "source.html",
+            snapshot=snapshot,
+            series_name=series_name,
+            codename=series_details.get("codename", "unknown"),
+            source_name=source_name,
+            source_yaml=source_yaml,
+            source_field_names=source_field_names,
+        )
 
     return app
 
@@ -113,29 +154,48 @@ def parse_last_modified(value: str | None) -> datetime | None:
         return None
 
 
+def is_series_root_number(value: str) -> bool:
+    return bool(SERIES_ROOT_PATTERN.fullmatch(value))
+
+
+def series_sort_key(series_name: str) -> tuple[int, int]:
+    major_str, minor_str = series_name.split(".", maxsplit=1)
+    return int(major_str), int(minor_str)
+
+
 def build_series_cards(series_map: dict[str, Any]) -> list[dict[str, Any]]:
     cards: list[dict[str, Any]] = []
 
-    for series_name, details in sorted(series_map.items(), reverse=True):
-        if not isinstance(details, dict):
-            continue
-
-        opening = details.get("opening")
+    for series_name, details in sorted(series_map.items(), key=lambda item: series_sort_key(item[0]), reverse=True):
+        field_names = sorted(details.keys()) if isinstance(details, dict) else []
+        opening = details.get("opening") if isinstance(details, dict) else None
         opening_steps = sorted(opening.keys()) if isinstance(opening, dict) else []
-        sources = details.get("sources")
+        sources = details.get("sources") if isinstance(details, dict) else None
         source_names = sorted(sources.keys()) if isinstance(sources, dict) else []
+        source_links = [
+            {
+                "name": source_name,
+                "url": url_for("source_detail", series_name=series_name, source_name=source_name),
+            }
+            for source_name in source_names
+        ]
+        rendered_yaml = yaml.safe_dump({series_name: details}, sort_keys=False, allow_unicode=False)
 
         cards.append(
             {
                 "series_name": series_name,
-                "codename": details.get("codename", "unknown"),
-                "supported": bool(details.get("supported")),
-                "development": bool(details.get("development")),
-                "lts": bool(details.get("lts")),
-                "esm": bool(details.get("esm")),
+                "codename": details.get("codename", "unknown") if isinstance(details, dict) else "n/a",
+                "supported": bool(details.get("supported")) if isinstance(details, dict) else False,
+                "development": bool(details.get("development")) if isinstance(details, dict) else False,
+                "lts": bool(details.get("lts")) if isinstance(details, dict) else False,
+                "esm": bool(details.get("esm")) if isinstance(details, dict) else False,
                 "opening_steps": opening_steps,
+                "field_count": len(field_names),
+                "field_names": field_names,
                 "source_count": len(source_names),
                 "source_names": source_names[:8],
+                "source_links": source_links,
+                "yaml_block": rendered_yaml,
             }
         )
 

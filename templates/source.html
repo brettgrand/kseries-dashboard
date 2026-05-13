@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Source Details | Ubuntu Kernel Series Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero">
+        <p class="eyebrow">Source details</p>
+        <h1>{{ source_name }}</h1>
+        <p class="hero-copy">
+          Series <strong>{{ series_name }}</strong> ({{ codename }}) from snapshot <strong>{{ snapshot.source_name }}</strong>.
+        </p>
+        <div class="hero-meta">
+          <a href="{{ url_for('index') }}">Back to dashboard</a>
+          <a href="{{ snapshot.source_url }}" target="_blank" rel="noreferrer">Open source YAML</a>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="panel">
+          <div class="panel-heading">
+            <h2>Source metadata</h2>
+            <p>{{ source_field_names|length }} fields</p>
+          </div>
+          <dl>
+            <div>
+              <dt>Series</dt>
+              <dd>{{ series_name }}</dd>
+            </div>
+            <div>
+              <dt>Codename</dt>
+              <dd>{{ codename }}</dd>
+            </div>
+            <div>
+              <dt>Top-level keys</dt>
+              <dd>{{ source_field_names|join(', ') if source_field_names else 'scalar entry' }}</dd>
+            </div>
+          </dl>
+          <pre class="series-yaml">{{ source_yaml }}</pre>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

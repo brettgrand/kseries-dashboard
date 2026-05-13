@@ -141,7 +141,7 @@ a {
 }
 
 .content-grid {
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  grid-template-columns: 1fr;
   align-items: start;
 }
 
@@ -187,6 +187,12 @@ a {
   font-size: 1.3rem;
 }
 
+.series-codename {
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
 .series-header p {
   margin: 4px 0 0;
 }
@@ -207,19 +213,16 @@ a {
   font-weight: 700;
 }
 
-.badge.supported {
+.badge.state-true {
   background: rgba(37, 96, 41, 0.14);
   color: var(--green);
+  border: 1px solid rgba(37, 96, 41, 0.3);
 }
 
-.badge.development {
-  background: rgba(13, 77, 139, 0.14);
-  color: var(--blue);
-}
-
-.badge.lts {
-  background: rgba(140, 106, 0, 0.14);
-  color: var(--gold);
+.badge.state-false {
+  background: rgba(160, 34, 34, 0.14);
+  color: #8f1f1f;
+  border: 1px solid rgba(160, 34, 34, 0.3);
 }
 
 .badge.esm {
@@ -245,9 +248,31 @@ dd {
   line-height: 1.45;
 }
 
-.raw-panel pre {
+.source-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.source-link {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  text-decoration: none;
+  border: 1px solid rgba(191, 91, 4, 0.35);
+  background: rgba(191, 91, 4, 0.08);
+  color: var(--accent);
+  font-size: 0.8rem;
+}
+
+.source-link:hover {
+  background: rgba(191, 91, 4, 0.18);
+}
+
+.series-yaml {
   margin: 0;
-  max-height: 75vh;
+  margin-top: 16px;
+  max-height: 28rem;
   overflow: auto;
   padding: 18px;
   border-radius: 20px;
@@ -258,13 +283,8 @@ dd {
 }
 
 @media (max-width: 1080px) {
-  .stats-grid,
-  .content-grid {
+  .stats-grid {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .content-grid {
-    grid-template-columns: 1fr;
   }
 }
 
