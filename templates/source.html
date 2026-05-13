@@ -39,9 +39,47 @@
               <dd>{{ codename }}</dd>
             </div>
             <div>
-              <dt>Top-level keys</dt>
-              <dd>{{ source_field_names|join(', ') if source_field_names else 'scalar entry' }}</dd>
+              <dt>Supported</dt>
+              <dd><span class="badge {{ 'state-true' if supported else 'state-false' }}">{{ 'true' if supported else 'false' }}</span></dd>
             </div>
+            <div>
+              <dt>Development</dt>
+              <dd><span class="badge {{ 'state-true' if development else 'state-false' }}">{{ 'true' if development else 'false' }}</span></dd>
+            </div>
+            {% if source_owner %}
+            <div>
+              <dt>Owner</dt>
+              <dd>{{ source_owner }}</dd>
+            </div>
+            {% endif %}
+            {% if source_swm and source_swm.items() %}
+            <div>
+              <dt>SWM</dt>
+              <dd>
+                {% for key, val in source_swm.items() %}
+                  {% if val is sameas true or val is sameas false %}
+                  <span class="source-link">{{ key }}: <span class="badge {{ 'state-true' if val else 'state-false' }}">{{ 'true' if val else 'false' }}</span></span>
+                  {% else %}
+                  <span class="source-link">{{ key }}: {{ val }}</span>
+                  {% endif %}
+                {% endfor %}
+              </dd>
+            </div>
+            {% endif %}
+            {% if source_packages %}
+            <div>
+              <dt>Packages</dt>
+              <dd class="source-links">
+                {% for pkg in source_packages %}
+                  {% if pkg.repo %}
+                  <a class="source-link" href="{{ pkg.repo }}" target="_blank" rel="noreferrer">{{ pkg.name }}</a>
+                  {% else %}
+                  <span class="source-link">{{ pkg.name }}</span>
+                  {% endif %}
+                {% endfor %}
+              </dd>
+            </div>
+            {% endif %}
           </dl>
           <details class="yaml-expand">
             <summary>Raw YAML</summary>

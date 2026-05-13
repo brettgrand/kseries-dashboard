@@ -85,6 +85,16 @@ def create_app() -> Flask:
             abort(404)
 
         source_field_names = sorted(source_details.keys()) if isinstance(source_details, dict) else []
+        raw_packages = source_details.get("packages", {}) if isinstance(source_details, dict) else {}
+        if not isinstance(raw_packages, dict):
+            raw_packages = {}
+        source_packages = [
+            {
+                "name": pkg_name,
+                "repo": (pkg_data.get("repo") or [None])[0] if isinstance(pkg_data, dict) else None,
+            }
+            for pkg_name, pkg_data in sorted(raw_packages.items())
+        ]
         source_yaml = yaml.safe_dump({source_name: source_details}, sort_keys=False, allow_unicode=False)
 
         return render_template(
@@ -92,7 +102,12 @@ def create_app() -> Flask:
             snapshot=snapshot,
             series_name=series_name,
             codename=series_details.get("codename", "unknown"),
+            supported=bool(series_details.get("supported")),
+            development=bool(series_details.get("development")),
             source_name=source_name,
+            source_owner=source_details.get("owner") if isinstance(source_details, dict) else None,
+            source_swm=source_details.get("swm") if isinstance(source_details, dict) else None,
+            source_packages=source_packages,
             source_yaml=source_yaml,
             source_field_names=source_field_names,
         )
