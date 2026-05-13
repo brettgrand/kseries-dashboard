@@ -43,7 +43,10 @@
               <dd>{{ source_field_names|join(', ') if source_field_names else 'scalar entry' }}</dd>
             </div>
           </dl>
-          <pre class="series-yaml">{{ source_yaml }}</pre>
+          <details class="yaml-expand">
+            <summary>Raw YAML</summary>
+            <pre class="series-yaml">{{ source_yaml }}</pre>
+          </details>
         </div>
       </section>
     </main>

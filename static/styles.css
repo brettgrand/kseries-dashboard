@@ -269,6 +269,40 @@ dd {
   background: rgba(191, 91, 4, 0.18);
 }
 
+.yaml-expand {
+  margin-top: 16px;
+}
+
+.yaml-expand > summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 6px 2px;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.yaml-expand > summary::before {
+  content: "▶";
+  font-size: 0.65rem;
+  transition: transform 0.15s;
+  display: inline-block;
+}
+
+.yaml-expand[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.yaml-expand .series-yaml {
+  margin-top: 8px;
+}
+
 .series-yaml {
   margin: 0;
   margin-top: 16px;
