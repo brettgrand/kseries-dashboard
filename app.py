@@ -143,6 +143,8 @@ def create_app() -> Flask:
             source_variants=source_details.get("variants") if isinstance(source_details, dict) else None,
             source_package_relations=source_details.get("package-relations") if isinstance(source_details, dict) else None,
             source_derived_from=source_details.get("derived-from") if isinstance(source_details, dict) else None,
+            source_invalid_tasks=source_details.get("invalid-tasks") if isinstance(source_details, dict) else None,
+            source_routing=source_details.get("routing") if isinstance(source_details, dict) else None,
             source_packages=source_packages,
             source_snaps=source_snaps,
             source_flavours=source_flavours,

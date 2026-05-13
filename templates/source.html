@@ -99,13 +99,25 @@
                   <dd><a href="{{ url_for('source_detail', series_name=source_derived_from[0], source_name=source_derived_from[1]) }}">{{ source_derived_from[0] }}/{{ source_derived_from[1] }}</a></dd>
                 </div>
                 {% endif %}
+                {% if source_invalid_tasks %}
+                <div class="col-6">
+                  <dt>Invalid tasks</dt>
+                  <dd>{{ source_invalid_tasks | join(', ') }}</dd>
+                </div>
+                {% endif %}
+                {% if source_routing %}
+                <div class="col-4">
+                  <dt>Routing</dt>
+                  <dd>{{ source_routing }}</dd>
+                </div>
+                {% endif %}
               </dl>
 
               {% if source_swm and source_swm.items() %}
               <hr>
               <h3 class="p-heading--5">SWM</h3>
               <dl class="row">
-                {% for key, val in source_swm.items() %}
+                {% for key, val in source_swm.items() if key != 'deployment-blackout' %}
                 <div class="col-2">
                   <dt>{{ key }}</dt>
                   <dd>
