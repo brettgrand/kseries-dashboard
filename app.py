@@ -72,7 +72,7 @@ def create_app() -> Flask:
     @app.route("/series/<series_name>/source/<path:source_name>")
     def source_detail(series_name: str, source_name: str) -> str:
         try:
-            snapshot = load_latest_snapshot()
+            snapshot = _load_requested_snapshot()
         except DashboardError as exc:
             return render_template("index.html", snapshot=None, series_cards=[], error_message=str(exc)), 502
 
@@ -160,7 +160,7 @@ def create_app() -> Flask:
     @app.route("/series/<series_name>/source/<source_name>/flavour/<flavour_name>")
     def flavour_detail(series_name: str, source_name: str, flavour_name: str) -> str:
         try:
-            snapshot = load_latest_snapshot()
+            snapshot = _load_requested_snapshot()
         except DashboardError as exc:
             return render_template("index.html", snapshot=None, series_cards=[], error_message=str(exc)), 502
 
@@ -204,7 +204,7 @@ def create_app() -> Flask:
     @app.route("/series/<series_name>/source/<source_name>/snap/<snap_name>")
     def snap_detail(series_name: str, source_name: str, snap_name: str) -> str:
         try:
-            snapshot = load_latest_snapshot()
+            snapshot = _load_requested_snapshot()
         except DashboardError as exc:
             return render_template("index.html", snapshot=None, series_cards=[], error_message=str(exc)), 502
 
@@ -246,7 +246,7 @@ def create_app() -> Flask:
     @app.route("/series/<series_name>/source/<source_name>/package/<package_name>")
     def package_detail(series_name: str, source_name: str, package_name: str) -> str:
         try:
-            snapshot = load_latest_snapshot()
+            snapshot = _load_requested_snapshot()
         except DashboardError as exc:
             return render_template("index.html", snapshot=None, series_cards=[], error_message=str(exc)), 502
 
@@ -331,6 +331,14 @@ def load_latest_snapshot() -> KernelSeriesSnapshot:
     session = requests.Session()
     source_name = find_latest_archived_yaml_name(session)
     return load_snapshot(source_name, session)
+
+
+def _load_requested_snapshot() -> KernelSeriesSnapshot:
+    session = requests.Session()
+    available = list_available_snapshots(session)
+    requested = request.args.get("snapshot", "")
+    name = requested if requested in available else available[0]
+    return load_snapshot(name, session)
 
 
 def find_latest_archived_yaml_name(session: requests.Session) -> str:
