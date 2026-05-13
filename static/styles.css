@@ -1,5 +1,15 @@
 /* Minimal overrides on top of Vanilla framework (hotlinked via CDN) */
 
+.u-chip--esm {
+  background-color: #E95420 !important;
+  border-color: #E95420 !important;
+  color: #fff !important;
+}
+
+.u-chip--esm .p-chip__value {
+  color: #fff !important;
+}
+
 .series-yaml {
   max-height: 28rem;
   overflow: auto;
