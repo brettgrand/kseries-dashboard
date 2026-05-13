@@ -93,6 +93,7 @@ def create_app() -> Flask:
                 "name": pkg_name,
                 "repo": (pkg_data.get("repo") or [None])[0] if isinstance(pkg_data, dict) else None,
                 "yaml": yaml.safe_dump(pkg_data, sort_keys=False, allow_unicode=False) if isinstance(pkg_data, dict) else str(pkg_data),
+                "url": url_for("package_detail", series_name=series_name, source_name=source_name, package_name=pkg_name),
             }
             for pkg_name, pkg_data in sorted(raw_packages.items())
         ]
@@ -131,6 +132,48 @@ def create_app() -> Flask:
             source_testing=source_testing,
             source_yaml=source_yaml,
             source_field_names=source_field_names,
+        )
+
+    @app.route("/series/<series_name>/source/<source_name>/package/<package_name>")
+    def package_detail(series_name: str, source_name: str, package_name: str) -> str:
+        try:
+            snapshot = load_latest_snapshot()
+        except DashboardError as exc:
+            return render_template("index.html", snapshot=None, series_cards=[], error_message=str(exc)), 502
+
+        series_details = snapshot.filtered_series_map.get(series_name)
+        if not isinstance(series_details, dict):
+            abort(404)
+
+        sources = series_details.get("sources")
+        if not isinstance(sources, dict):
+            abort(404)
+
+        source_details = sources.get(source_name)
+        if not isinstance(source_details, dict):
+            abort(404)
+
+        raw_packages = source_details.get("packages", {})
+        if not isinstance(raw_packages, dict):
+            abort(404)
+
+        pkg_data = raw_packages.get(package_name)
+        if pkg_data is None:
+            abort(404)
+
+        pkg_repo = (pkg_data.get("repo") or [None])[0] if isinstance(pkg_data, dict) else None
+        pkg_yaml = yaml.safe_dump({package_name: pkg_data}, sort_keys=False, allow_unicode=False)
+
+        return render_template(
+            "package.html",
+            snapshot=snapshot,
+            series_name=series_name,
+            codename=series_details.get("codename", "unknown"),
+            source_name=source_name,
+            package_name=package_name,
+            pkg_repo=pkg_repo,
+            pkg_yaml=pkg_yaml,
+            pkg_data=pkg_data if isinstance(pkg_data, dict) else {},
         )
 
     return app

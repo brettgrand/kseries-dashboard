@@ -69,12 +69,9 @@
             {% if source_packages %}
             <div>
               <dt>Packages</dt>
-              <dd>
+              <dd class="source-links">
                 {% for pkg in source_packages %}
-                <details class="yaml-expand">
-                  <summary>{% if pkg.repo %}<a href="{{ pkg.repo }}" target="_blank" rel="noreferrer">{{ pkg.name }}</a><button class="copy-btn" type="button" aria-label="Copy link" onclick="navigator.clipboard.writeText('{{ pkg.repo }}')">&#128203;</button>{% else %}{{ pkg.name }}{% endif %}</summary>
-                  <pre class="series-yaml">{{ pkg.yaml }}</pre>
-                </details>
+                <a class="source-link" href="{{ pkg.url }}">{{ pkg.name }}</a>
                 {% endfor %}
               </dd>
             </div>
