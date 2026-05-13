@@ -1,18 +1,18 @@
 :root {
   color-scheme: light;
-  --bg: #f2efe8;
-  --panel: rgba(255, 252, 246, 0.78);
-  --panel-strong: #fffaf0;
-  --ink: #1f1b18;
-  --muted: #6f665d;
-  --line: rgba(31, 27, 24, 0.12);
-  --accent: #bf5b04;
-  --accent-soft: #ffd7ae;
+  --bg: #F6F6F5;                           /* Warm grey 10% */
+  --panel: rgba(255, 255, 255, 0.85);
+  --panel-strong: #FFFFFF;
+  --ink: #111111;                          /* Text grey */
+  --muted: #AEA79F;                        /* Warm grey */
+  --line: rgba(174, 167, 159, 0.4);        /* Warm grey */
+  --accent: #E95420;                       /* Ubuntu Orange */
+  --accent-soft: #F8CCBC;                  /* Ubuntu Orange 30% */
   --green: #256029;
-  --blue: #0d4d8b;
-  --gold: #8c6a00;
-  --rose: #8f3a4a;
-  --shadow: 0 18px 50px rgba(72, 49, 24, 0.12);
+  --blue: #772953;                         /* Canonical aubergine */
+  --gold: #5E2750;                         /* Mid aubergine */
+  --rose: #77216F;                         /* Light aubergine */
+  --shadow: 0 18px 50px rgba(44, 0, 30, 0.10);
 }
 
 * {
@@ -24,9 +24,9 @@ body {
   font-family: "Space Grotesk", sans-serif;
   color: var(--ink);
   background:
-    radial-gradient(circle at top left, rgba(255, 194, 124, 0.6), transparent 28%),
-    radial-gradient(circle at right 20%, rgba(228, 117, 77, 0.22), transparent 20%),
-    linear-gradient(180deg, #f8f2e7 0%, var(--bg) 48%, #ebe3d2 100%);
+    radial-gradient(circle at top left, rgba(233, 84, 32, 0.12), transparent 28%),
+    radial-gradient(circle at right 20%, rgba(119, 33, 111, 0.08), transparent 20%),
+    linear-gradient(180deg, #FFFFFF 0%, var(--bg) 48%, #EEEEEC 100%);
   min-height: 100vh;
 }
 
@@ -58,7 +58,7 @@ body {
   inset: auto -60px -80px auto;
   width: 220px;
   height: 220px;
-  background: radial-gradient(circle, rgba(191, 91, 4, 0.18), transparent 72%);
+  background: radial-gradient(circle, rgba(233, 84, 32, 0.14), transparent 72%);
 }
 
 .eyebrow,
@@ -130,7 +130,7 @@ a {
 }
 
 .stat-card.accent {
-  background: linear-gradient(135deg, rgba(191, 91, 4, 0.18), rgba(255, 250, 240, 0.92));
+  background: linear-gradient(135deg, rgba(233, 84, 32, 0.12), rgba(255, 255, 255, 0.95));
 }
 
 .stat-label {
@@ -152,7 +152,7 @@ a {
 
 .error-panel {
   margin-top: 18px;
-  background: linear-gradient(135deg, rgba(143, 58, 74, 0.14), rgba(255, 252, 246, 0.88));
+  background: linear-gradient(135deg, rgba(119, 33, 111, 0.10), rgba(255, 255, 255, 0.92));
 }
 
 .panel-heading {
@@ -220,14 +220,14 @@ a {
 }
 
 .badge.state-false {
-  background: rgba(160, 34, 34, 0.14);
-  color: #8f1f1f;
-  border: 1px solid rgba(160, 34, 34, 0.3);
+  background: rgba(119, 33, 111, 0.10);
+  color: #77216F;
+  border: 1px solid rgba(119, 33, 111, 0.3);
 }
 
 .badge.esm {
-  background: rgba(143, 58, 74, 0.12);
-  color: var(--rose);
+  background: rgba(94, 39, 80, 0.10);
+  color: var(--gold);
 }
 
 dl {
@@ -259,14 +259,14 @@ dd {
   padding: 5px 10px;
   border-radius: 999px;
   text-decoration: none;
-  border: 1px solid rgba(191, 91, 4, 0.35);
-  background: rgba(191, 91, 4, 0.08);
+  border: 1px solid rgba(233, 84, 32, 0.35);
+  background: rgba(233, 84, 32, 0.07);
   color: var(--accent);
   font-size: 0.8rem;
 }
 
 .source-link:hover {
-  background: rgba(191, 91, 4, 0.18);
+  background: rgba(233, 84, 32, 0.16);
 }
 
 .yaml-expand {
@@ -321,9 +321,9 @@ dd {
   overflow: auto;
   padding: 18px;
   border-radius: 20px;
-  background: #201a17;
-  color: #f8f1e6;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #2C001E;  /* Dark aubergine */
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.10);
   font: 0.88rem/1.55 "IBM Plex Mono", monospace;
 }
 
