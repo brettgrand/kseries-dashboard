@@ -296,8 +296,7 @@ def list_available_snapshots(session: requests.Session) -> list[str]:
         return [LIVE_YAML_NAME]
 
     candidates = sorted(set(ARCHIVE_PATTERN.findall(response.text)), reverse=True)
-    names = [f"{LIVE_YAML_NAME}@{stamp}" for stamp in candidates]
-    names.append(LIVE_YAML_NAME)
+    names = [LIVE_YAML_NAME] + [f"{LIVE_YAML_NAME}@{stamp}" for stamp in candidates]
     return names
 
 
