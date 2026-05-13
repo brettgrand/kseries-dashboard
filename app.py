@@ -92,6 +92,7 @@ def create_app() -> Flask:
             {
                 "name": pkg_name,
                 "repo": (pkg_data.get("repo") or [None])[0] if isinstance(pkg_data, dict) else None,
+                "yaml": yaml.safe_dump(pkg_data, sort_keys=False, allow_unicode=False) if isinstance(pkg_data, dict) else str(pkg_data),
             }
             for pkg_name, pkg_data in sorted(raw_packages.items())
         ]
@@ -102,6 +103,7 @@ def create_app() -> Flask:
             {
                 "name": snap_name,
                 "repo": (snap_data.get("repo") or [None])[0] if isinstance(snap_data, dict) else None,
+                "yaml": yaml.safe_dump(snap_data, sort_keys=False, allow_unicode=False) if isinstance(snap_data, dict) else str(snap_data),
             }
             for snap_name, snap_data in sorted(raw_snaps.items())
         ]

@@ -69,13 +69,12 @@
             {% if source_packages %}
             <div>
               <dt>Packages</dt>
-              <dd class="source-links">
+              <dd>
                 {% for pkg in source_packages %}
-                  {% if pkg.repo %}
-                  <a class="source-link" href="{{ pkg.repo }}" target="_blank" rel="noreferrer">{{ pkg.name }}</a>
-                  {% else %}
-                  <span class="source-link">{{ pkg.name }}</span>
-                  {% endif %}
+                <details class="yaml-expand">
+                  <summary>{% if pkg.repo %}<a href="{{ pkg.repo }}" target="_blank" rel="noreferrer">{{ pkg.name }}</a><button class="copy-btn" type="button" aria-label="Copy link" onclick="navigator.clipboard.writeText('{{ pkg.repo }}')">&#128203;</button>{% else %}{{ pkg.name }}{% endif %}</summary>
+                  <pre class="series-yaml">{{ pkg.yaml }}</pre>
+                </details>
                 {% endfor %}
               </dd>
             </div>
@@ -83,13 +82,12 @@
             {% if source_snaps %}
             <div>
               <dt>Snaps</dt>
-              <dd class="source-links">
+              <dd>
                 {% for snap in source_snaps %}
-                  {% if snap.repo %}
-                  <a class="source-link" href="{{ snap.repo }}" target="_blank" rel="noreferrer">{{ snap.name }}</a>
-                  {% else %}
-                  <span class="source-link">{{ snap.name }}</span>
-                  {% endif %}
+                <details class="yaml-expand">
+                  <summary>{% if snap.repo %}<a href="{{ snap.repo }}" target="_blank" rel="noreferrer">{{ snap.name }}</a><button class="copy-btn" type="button" aria-label="Copy link" onclick="navigator.clipboard.writeText('{{ snap.repo }}')">&#128203;</button>{% else %}{{ snap.name }}{% endif %}</summary>
+                  <pre class="series-yaml">{{ snap.yaml }}</pre>
+                </details>
                 {% endfor %}
               </dd>
             </div>
