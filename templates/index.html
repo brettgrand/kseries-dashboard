@@ -42,24 +42,6 @@
         <p>{{ error_message }}</p>
       </section>
       {% elif snapshot %}
-      <section class="stats-grid">
-        <article class="stat-card">
-          <span class="stat-label">Series</span>
-          <strong>{{ snapshot.total_series }}</strong>
-        </article>
-        <article class="stat-card">
-          <span class="stat-label">Supported</span>
-          <strong>{{ snapshot.supported_series }}</strong>
-        </article>
-        <article class="stat-card">
-          <span class="stat-label">Development</span>
-          <strong>{{ snapshot.development_series }}</strong>
-        </article>
-        <article class="stat-card accent">
-          <span class="stat-label">Snapshot</span>
-          <strong>{{ snapshot.source_name }}</strong>
-        </article>
-      </section>
 
       <section class="content-grid">
         <div class="panel">
@@ -83,15 +65,7 @@
               </div>
               <dl>
                 <div>
-                  <dt>Fields</dt>
-                  <dd>{{ card.field_count }}</dd>
-                </div>
-                <div>
-                  <dt>Top-level keys</dt>
-                  <dd>{{ card.field_names|join(', ') if card.field_names else 'scalar entry' }}</dd>
-                </div>
-                <div>
-                  <dt>Source pages</dt>
+                  <dt>Source packages</dt>
                   <dd class="source-links">
                     {% if card.source_links %}
                       {% for source in card.source_links %}
