@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ubuntu Kernel Series Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero">
+        <p class="eyebrow">Flask dashboard</p>
+        <h1>Ubuntu kernel series snapshot</h1>
+        {% if snapshot %}
+        <p class="hero-copy">
+          Structured view of the latest archived <strong>{{ snapshot.source_name }}</strong>
+          published on kernel.ubuntu.com.
+        </p>
+        <div class="hero-meta">
+          <a href="{{ snapshot.source_url }}" target="_blank" rel="noreferrer">Open source YAML</a>
+          <span>Fetched {{ snapshot.fetched_at.strftime('%Y-%m-%d %H:%M:%S %Z') }}</span>
+          {% if snapshot.last_modified %}
+          <span>Last modified {{ snapshot.last_modified.strftime('%Y-%m-%d %H:%M:%S %Z') }}</span>
+          {% endif %}
+        </div>
+        {% else %}
+        <p class="hero-copy">
+          The dashboard could not load the latest kernel series snapshot from kernel.ubuntu.com.
+        </p>
+        {% endif %}
+      </section>
+
+      {% if error_message %}
+      <section class="panel error-panel">
+        <div class="panel-heading">
+          <h2>Upstream fetch failed</h2>
+          <p>Status 502</p>
+        </div>
+        <p>{{ error_message }}</p>
+      </section>
+      {% elif snapshot %}
+      <section class="stats-grid">
+        <article class="stat-card">
+          <span class="stat-label">Series</span>
+          <strong>{{ snapshot.total_series }}</strong>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Supported</span>
+          <strong>{{ snapshot.supported_series }}</strong>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Development</span>
+          <strong>{{ snapshot.development_series }}</strong>
+        </article>
+        <article class="stat-card accent">
+          <span class="stat-label">Snapshot</span>
+          <strong>{{ snapshot.source_name }}</strong>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <div class="panel">
+          <div class="panel-heading">
+            <h2>Series overview</h2>
+            <p>{{ series_cards|length }} rows</p>
+          </div>
+          <div class="series-grid">
+            {% for card in series_cards %}
+            <article class="series-card">
+              <div class="series-header">
+                <div>
+                  <h3>{{ card.series_name }}</h3>
+                  <p>{{ card.codename }}</p>
+                </div>
+                <div class="badges">
+                  {% if card.supported %}<span class="badge supported">supported</span>{% endif %}
+                  {% if card.development %}<span class="badge development">development</span>{% endif %}
+                  {% if card.lts %}<span class="badge lts">lts</span>{% endif %}
+                  {% if card.esm %}<span class="badge esm">esm</span>{% endif %}
+                </div>
+              </div>
+              <dl>
+                <div>
+                  <dt>Sources</dt>
+                  <dd>{{ card.source_count }}</dd>
+                </div>
+                <div>
+                  <dt>Opening flags</dt>
+                  <dd>{{ card.opening_steps|join(', ') if card.opening_steps else 'none' }}</dd>
+                </div>
+                <div>
+                  <dt>Sample sources</dt>
+                  <dd>{{ card.source_names|join(', ') if card.source_names else 'none' }}</dd>
+                </div>
+              </dl>
+            </article>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="panel raw-panel">
+          <div class="panel-heading">
+            <h2>Raw YAML</h2>
+            <p>Direct payload for inspection</p>
+          </div>
+          <pre>{{ snapshot.raw_yaml }}</pre>
+        </div>
+      </section>
+      {% endif %}
+    </main>
+  </body>
+</html>
