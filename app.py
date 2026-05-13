@@ -9,7 +9,7 @@ from typing import Any
 
 import requests
 import yaml
-from flask import Flask, abort, render_template, url_for
+from flask import Flask, abort, render_template, request, url_for
 
 
 BASE_URL = "https://kernel.ubuntu.com/info/"
@@ -59,11 +59,15 @@ def create_app() -> Flask:
     @app.route("/")
     def index() -> str:
         try:
-            snapshot = load_latest_snapshot()
+            session = requests.Session()
+            available_snapshots = list_available_snapshots(session)
+            requested = request.args.get("snapshot", "")
+            selected_name = requested if requested in available_snapshots else available_snapshots[0]
+            snapshot = load_snapshot(selected_name, session)
             series_cards = build_series_cards(snapshot.filtered_series_map)
-            return render_template("index.html", snapshot=snapshot, series_cards=series_cards, error_message=None)
+            return render_template("index.html", snapshot=snapshot, series_cards=series_cards, error_message=None, available_snapshots=available_snapshots)
         except DashboardError as exc:
-            return render_template("index.html", snapshot=None, series_cards=[], error_message=str(exc)), 502
+            return render_template("index.html", snapshot=None, series_cards=[], error_message=str(exc), available_snapshots=[]), 502
 
     @app.route("/series/<series_name>/source/<path:source_name>")
     def source_detail(series_name: str, source_name: str) -> str:
@@ -284,9 +288,20 @@ def create_app() -> Flask:
     return app
 
 
-def load_latest_snapshot() -> KernelSeriesSnapshot:
-    session = requests.Session()
-    source_name = find_latest_archived_yaml_name(session)
+def list_available_snapshots(session: requests.Session) -> list[str]:
+    try:
+        response = session.get(BASE_URL, timeout=REQUEST_TIMEOUT)
+        response.raise_for_status()
+    except requests.RequestException:
+        return [LIVE_YAML_NAME]
+
+    candidates = sorted(set(ARCHIVE_PATTERN.findall(response.text)), reverse=True)
+    names = [f"{LIVE_YAML_NAME}@{stamp}" for stamp in candidates]
+    names.append(LIVE_YAML_NAME)
+    return names
+
+
+def load_snapshot(source_name: str, session: requests.Session) -> KernelSeriesSnapshot:
     source_url = f"{BASE_URL}{source_name}"
 
     try:
@@ -311,6 +326,12 @@ def load_latest_snapshot() -> KernelSeriesSnapshot:
         raw_yaml=response.text,
         series_map=parsed_yaml,
     )
+
+
+def load_latest_snapshot() -> KernelSeriesSnapshot:
+    session = requests.Session()
+    source_name = find_latest_archived_yaml_name(session)
+    return load_snapshot(source_name, session)
 
 
 def find_latest_archived_yaml_name(session: requests.Session) -> str:

@@ -40,6 +40,18 @@
           <p>The dashboard could not load the latest kernel series snapshot from kernel.ubuntu.com.</p>
           {% endif %}
         </div>
+        {% if available_snapshots %}
+        <div class="col-4">
+          <form method="get">
+            <label class="p-form__label" for="snapshot-select">Snapshot</label>
+            <select id="snapshot-select" name="snapshot" class="p-form__control" onchange="this.form.submit()">
+              {% for name in available_snapshots %}
+              <option value="{{ name }}"{% if snapshot and name == snapshot.source_name %} selected{% endif %}>{{ name }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+        {% endif %}
       </div>
     </section>
 
