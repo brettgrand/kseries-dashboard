@@ -3,22 +3,145 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Source Details | Ubuntu Kernel Series Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>{{ source_name }} | Ubuntu Kernel Series Dashboard</title>
+    <link rel="stylesheet" href="https://assets.ubuntu.com/v1/vanilla_framework_version_4.51.0.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
   <body>
-    <main class="page-shell">
-      <section class="hero">
-        <p class="eyebrow">Source details</p>
-        <h1>{{ source_name }}</h1>
-        <p class="hero-copy">
-          Series <strong>{{ series_name }}</strong> ({{ codename }}) from snapshot <strong>{{ snapshot.source_name }}</strong>.
-        </p>
-        <div class="hero-meta">
-          <a href="{{ url_for('index') }}">Back to dashboard</a>
+    <header class="p-navigation" role="banner">
+      <div class="p-navigation__banner">
+        <div class="p-navigation__tagged-logo">
+          <a href="{{ url_for('index') }}" class="p-navigation__link">
+            <span class="p-navigation__logo-title">Ubuntu Kernel Series Dashboard</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="p-strip is-shallow">
+      <div class="row">
+        <div class="col-8">
+          <nav aria-label="breadcrumb">
+            <ol class="p-breadcrumbs">
+              <li class="p-breadcrumbs__item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+              <li class="p-breadcrumbs__item">{{ series_name }} ({{ codename }})</li>
+              <li class="p-breadcrumbs__item" aria-current="page">{{ source_name }}</li>
+            </ol>
+          </nav>
+          <h1>{{ source_name }}</h1>
+          <p>
+            Source in series <strong>{{ series_name }}</strong> ({{ codename }}) &mdash;
+            snapshot <strong>{{ snapshot.source_name }}</strong>.
+          </p>
+          <p><a href="{{ snapshot.source_url }}" target="_blank" rel="noreferrer">Open source YAML</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="p-strip u-no-padding--top">
+      <div class="row">
+        <div class="col-12">
+          <div class="p-card">
+            <h2 class="p-card__title p-heading--3">Source metadata</h2>
+            <div class="p-card__content">
+              <dl class="row">
+                <div class="col-2">
+                  <dt>Series</dt>
+                  <dd>{{ series_name }}</dd>
+                </div>
+                <div class="col-2">
+                  <dt>Codename</dt>
+                  <dd>{{ codename }}</dd>
+                </div>
+                <div class="col-2">
+                  <dt>Supported</dt>
+                  <dd>
+                    <span class="p-chip--{{ 'positive' if supported else 'negative' }} is-inline is-dense is-read-only">
+                      <span class="p-chip__value">{{ 'true' if supported else 'false' }}</span>
+                    </span>
+                  </dd>
+                </div>
+                <div class="col-2">
+                  <dt>Development</dt>
+                  <dd>
+                    <span class="p-chip--{{ 'positive' if development else 'negative' }} is-inline is-dense is-read-only">
+                      <span class="p-chip__value">{{ 'true' if development else 'false' }}</span>
+                    </span>
+                  </dd>
+                </div>
+                {% if source_owner %}
+                <div class="col-4">
+                  <dt>Owner</dt>
+                  <dd>{{ source_owner }}</dd>
+                </div>
+                {% endif %}
+              </dl>
+
+              {% if source_swm and source_swm.items() %}
+              <hr>
+              <h3 class="p-heading--5">SWM</h3>
+              <dl class="row">
+                {% for key, val in source_swm.items() %}
+                <div class="col-2">
+                  <dt>{{ key }}</dt>
+                  <dd>
+                    {% if val is sameas true or val is sameas false %}
+                    <span class="p-chip--{{ 'positive' if val else 'negative' }} is-inline is-dense is-read-only">
+                      <span class="p-chip__value">{{ 'true' if val else 'false' }}</span>
+                    </span>
+                    {% else %}
+                    {{ val }}
+                    {% endif %}
+                  </dd>
+                </div>
+                {% endfor %}
+              </dl>
+              {% endif %}
+
+              {% if source_packages %}
+              <hr>
+              <h3 class="p-heading--5">Packages</h3>
+              <ul class="p-list">
+                {% for pkg in source_packages %}
+                <li class="p-list__item"><a href="{{ pkg.url }}">{{ pkg.name }}</a></li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+
+              {% if source_snaps %}
+              <hr>
+              <h3 class="p-heading--5">Snaps</h3>
+              {% for snap in source_snaps %}
+              <details class="u-yaml-expand">
+                <summary>{% if snap.repo %}<a href="{{ snap.repo }}" target="_blank" rel="noreferrer">{{ snap.name }}</a><button class="copy-btn" type="button" aria-label="Copy link" onclick="navigator.clipboard.writeText('{{ snap.repo }}')">&#128203;</button>{% else %}{{ snap.name }}{% endif %}</summary>
+                <pre class="series-yaml"><code>{{ snap.yaml }}</code></pre>
+              </details>
+              {% endfor %}
+              {% endif %}
+
+              {% if source_testing %}
+              <hr>
+              <h3 class="p-heading--5">Testing</h3>
+              {% for entry in source_testing %}
+              <details class="u-yaml-expand">
+                <summary>{{ entry.key }}</summary>
+                <pre class="series-yaml"><code>{{ entry.yaml }}</code></pre>
+              </details>
+              {% endfor %}
+              {% endif %}
+
+              <hr>
+              <details class="u-yaml-expand">
+                <summary>Raw YAML</summary>
+                <pre class="series-yaml"><code>{{ source_yaml }}</code></pre>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
           <a href="{{ snapshot.source_url }}" target="_blank" rel="noreferrer">Open source YAML</a>
         </div>
       </section>

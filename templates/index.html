@@ -4,89 +4,109 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ubuntu Kernel Series Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://assets.ubuntu.com/v1/vanilla_framework_version_4.51.0.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
   <body>
-    <main class="page-shell">
-      <section class="hero">
-        <p class="eyebrow">Flask dashboard</p>
-        <h1>Ubuntu kernel series snapshot</h1>
-        {% if snapshot %}
-        <p class="hero-copy">
-          Structured view of the latest archived <strong>{{ snapshot.source_name }}</strong>
-          published on kernel.ubuntu.com.
-        </p>
-        <div class="hero-meta">
-          <a href="{{ snapshot.source_url }}" target="_blank" rel="noreferrer">Open source YAML</a>
-          <span>Fetched {{ snapshot.fetched_at.strftime('%Y-%m-%d %H:%M:%S %Z') }}</span>
-          {% if snapshot.last_modified %}
-          <span>Last modified {{ snapshot.last_modified.strftime('%Y-%m-%d %H:%M:%S %Z') }}</span>
+    <header class="p-navigation" role="banner">
+      <div class="p-navigation__banner">
+        <div class="p-navigation__tagged-logo">
+          <a href="{{ url_for('index') }}" class="p-navigation__link">
+            <span class="p-navigation__logo-title">Ubuntu Kernel Series Dashboard</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="p-strip is-shallow">
+      <div class="row">
+        <div class="col-8">
+          <p class="p-muted-heading">Flask dashboard</p>
+          <h1>Ubuntu kernel series snapshot</h1>
+          {% if snapshot %}
+          <p>
+            Structured view of the latest archived <strong>{{ snapshot.source_name }}</strong>
+            published on kernel.ubuntu.com.
+          </p>
+          <p>
+            <a href="{{ snapshot.source_url }}" target="_blank" rel="noreferrer">Open source YAML</a>
+            &ensp;
+            <span class="u-text--muted">Fetched {{ snapshot.fetched_at.strftime('%Y-%m-%d %H:%M:%S %Z') }}</span>
+            {% if snapshot.last_modified %}
+            &ensp;
+            <span class="u-text--muted">Last modified {{ snapshot.last_modified.strftime('%Y-%m-%d %H:%M:%S %Z') }}</span>
+            {% endif %}
+          </p>
+          {% else %}
+          <p>The dashboard could not load the latest kernel series snapshot from kernel.ubuntu.com.</p>
           {% endif %}
         </div>
-        {% else %}
-        <p class="hero-copy">
-          The dashboard could not load the latest kernel series snapshot from kernel.ubuntu.com.
-        </p>
-        {% endif %}
-      </section>
+      </div>
+    </section>
 
-      {% if error_message %}
-      <section class="panel error-panel">
-        <div class="panel-heading">
-          <h2>Upstream fetch failed</h2>
-          <p>Status 502</p>
+    {% if error_message %}
+    <div class="u-fixed-width">
+      <div class="p-notification--negative">
+        <div class="p-notification__content">
+          <h5 class="p-notification__title">Upstream fetch failed</h5>
+          <p class="p-notification__message">{{ error_message }}</p>
         </div>
-        <p>{{ error_message }}</p>
-      </section>
-      {% elif snapshot %}
-
-      <section class="content-grid">
-        <div class="panel">
-          <div class="panel-heading">
-            <h2>Ubuntu Kernels</h2>
-            <p>{{ series_cards|length }} rows</p>
-          </div>
-          <div class="series-grid">
-            {% for card in series_cards %}
-            <article class="series-card">
-              <div class="series-header">
-                <div>
-                  <h3>{{ card.series_name }} <span class="series-codename">({{ card.codename }})</span></h3>
-                </div>
-                <div class="badges">
-                  <span class="badge {{ 'state-true' if card.supported else 'state-false' }}">supported: {{ 'true' if card.supported else 'false' }}</span>
-                  <span class="badge {{ 'state-true' if card.development else 'state-false' }}">development: {{ 'true' if card.development else 'false' }}</span>
-                  <span class="badge {{ 'state-true' if card.lts else 'state-false' }}">lts: {{ 'true' if card.lts else 'false' }}</span>
-                  {% if card.esm %}<span class="badge esm">esm</span>{% endif %}
-                </div>
+      </div>
+    </div>
+    {% elif snapshot %}
+    <section class="p-strip u-no-padding--top">
+      <div class="row">
+        <div class="col-12">
+          <h2>Ubuntu Kernels <small class="u-text--muted u-text--normal">{{ series_cards|length }} series</small></h2>
+        </div>
+      </div>
+      <div class="row">
+        {% for card in series_cards %}
+        <div class="col-3">
+          <div class="p-card">
+            <h3 class="p-card__title p-heading--4">
+              {{ card.series_name }} <small class="u-text--muted">{{ card.codename }}</small>
+            </h3>
+            <div class="p-card__content">
+              <div>
+                <span class="p-chip--{{ 'positive' if card.supported else 'negative' }} is-inline is-dense is-read-only">
+                  <span class="p-chip__value">supported: {{ 'true' if card.supported else 'false' }}</span>
+                </span>
+                <span class="p-chip--{{ 'positive' if card.development else 'negative' }} is-inline is-dense is-read-only">
+                  <span class="p-chip__value">development: {{ 'true' if card.development else 'false' }}</span>
+                </span>
+                <span class="p-chip--{{ 'positive' if card.lts else 'negative' }} is-inline is-dense is-read-only">
+                  <span class="p-chip__value">lts: {{ 'true' if card.lts else 'false' }}</span>
+                </span>
+                {% if card.esm %}
+                <span class="p-chip is-inline is-dense is-read-only">
+                  <span class="p-chip__value">esm</span>
+                </span>
+                {% endif %}
               </div>
+              <hr>
               <dl>
-                <div>
-                  <dt>Source packages</dt>
-                  <dd class="source-links">
-                    {% if card.source_links %}
-                      {% for source in card.source_links %}
-                      <a class="source-link" href="{{ source.url }}">{{ source.name }}</a>
-                      {% endfor %}
-                    {% else %}
-                      none
-                    {% endif %}
-                  </dd>
-                </div>
+                <dt>Source packages</dt>
+                <dd>
+                  {% if card.source_links %}
+                    {% for source in card.source_links %}
+                    <a href="{{ source.url }}">{{ source.name }}</a>{% if not loop.last %}&ensp;{% endif %}
+                    {% endfor %}
+                  {% else %}
+                    <span class="u-text--muted">none</span>
+                  {% endif %}
+                </dd>
               </dl>
-              <details class="yaml-expand">
+              <details class="u-yaml-expand">
                 <summary>Raw YAML</summary>
-                <pre class="series-yaml">{{ card.yaml_block }}</pre>
+                <pre class="series-yaml"><code>{{ card.yaml_block }}</code></pre>
               </details>
-            </article>
-            {% endfor %}
+            </div>
           </div>
         </div>
-      </section>
-      {% endif %}
-    </main>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
   </body>
 </html>
