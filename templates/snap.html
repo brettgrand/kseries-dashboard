@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ snap_name }} | Ubuntu Kernel Series Dashboard</title>
+    <link rel="stylesheet" href="https://assets.ubuntu.com/v1/vanilla_framework_version_4.51.0.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <header class="p-navigation" role="banner">
+      <div class="p-navigation__banner">
+        <div class="p-navigation__tagged-logo">
+          <a href="{{ url_for('index') }}" class="p-navigation__link">
+            <span class="p-navigation__logo-title">Ubuntu Kernel Series Dashboard</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="p-strip is-shallow">
+      <div class="row">
+        <div class="col-8">
+          <nav aria-label="breadcrumb">
+            <ol class="p-breadcrumbs">
+              <li class="p-breadcrumbs__item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+              <li class="p-breadcrumbs__item"><a href="{{ url_for('source_detail', series_name=series_name, source_name=source_name) }}">{{ source_name }}</a></li>
+              <li class="p-breadcrumbs__item" aria-current="page">{{ snap_name }}</li>
+            </ol>
+          </nav>
+          <h1>{{ snap_name }}</h1>
+          <p>
+            Snap in <strong>{{ source_name }}</strong> &mdash;
+            series <strong>{{ series_name }}</strong> ({{ codename }}).
+          </p>
+          {% if snap_repo %}
+          <p>
+            <a href="{{ snap_repo }}" target="_blank" rel="noreferrer">Open repo</a>
+            <button class="copy-btn" type="button" aria-label="Copy repo link" onclick="navigator.clipboard.writeText('{{ snap_repo }}')">&#128203;</button>
+          </p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="p-strip u-no-padding--top">
+      <div class="row">
+        <div class="col-12">
+          <div class="p-card">
+            <h2 class="p-card__title p-heading--3">Snap metadata</h2>
+            <div class="p-card__content">
+              <dl class="row">
+                {% for key, val in snap_data.items() %}
+                {% if key == 'repo' and val is iterable and val is not string %}
+                <div class="col-6">
+                  <dt>url</dt>
+                  <dd>
+                    <a href="{{ val[0] }}" target="_blank" rel="noreferrer">{{ val[0] }}</a>
+                    <button class="copy-btn" type="button" aria-label="Copy link" onclick="navigator.clipboard.writeText('{{ val[0] }}')">&#128203;</button>
+                  </dd>
+                </div>
+                {% if val|length > 1 %}
+                <div class="col-6">
+                  <dt>branch</dt>
+                  <dd>{{ val[1] }}</dd>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="col-3">
+                  <dt>{{ key }}</dt>
+                  <dd>
+                    {% if val is sameas true or val is sameas false %}
+                    <span class="p-chip--{{ 'positive' if val else 'negative' }} is-inline is-dense is-read-only">
+                      <span class="p-chip__value">{{ 'true' if val else 'false' }}</span>
+                    </span>
+                    {% elif val is iterable and val is not string %}
+                      {% for item in val %}
+                      <span>{{ item }}</span>{% if not loop.last %}, {% endif %}
+                      {% endfor %}
+                    {% else %}
+                    {{ val }}
+                    {% endif %}
+                  </dd>
+                </div>
+                {% endif %}
+                {% endfor %}
+              </dl>
+              <hr>
+              <details class="u-yaml-expand">
+                <summary>Raw YAML</summary>
+                <pre class="series-yaml"><code>{{ snap_yaml }}</code></pre>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
